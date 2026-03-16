@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:test_bus_app/bloc/auth/auth_bloc.dart';
 import 'package:test_bus_app/bloc/auth/auth_event.dart';
 import 'package:test_bus_app/bloc/auth/auth_state.dart';
@@ -16,12 +17,19 @@ Future<void> mainCommon(AppConfig config) async {
   // Initialize Config
   AppConfig.initialize(config);
 
+  // Initialize Supabase
+  await Supabase.initialize(
+    url: AppConfig.supabaseUrl,
+    anonKey: AppConfig.supabaseAnonKey,
+  );
+
   // Initialize dependency injection
   await setupLocator();
 
   final logger = getIt<AppLogger>();
   logger.info(
       "Starting app in ${AppConfig.environment.name.toUpperCase()} mode hitting ${AppConfig.baseUrl}");
+  logger.info("Supabase connected: ${AppConfig.supabaseUrl}");
 
   runApp(const App());
 }

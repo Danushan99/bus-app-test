@@ -26,6 +26,9 @@ dependencies:
   http: ^1.2.1
   connectivity_plus: ^6.1.1
 
+  # Supabase
+  supabase_flutter: ^2.8.4
+
   # Storage
   shared_preferences: ^2.3.3
   flutter_secure_storage: ^9.2.4
