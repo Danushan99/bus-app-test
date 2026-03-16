@@ -8,8 +8,11 @@ import 'package:test_bus_app/network/interceptors/auth_interceptor.dart';
 import 'package:test_bus_app/network/interceptors/error_interceptor.dart';
 import 'package:test_bus_app/network/network_api_service.dart';
 import 'package:test_bus_app/repository/auth/auth_repository.dart';
+import 'package:test_bus_app/repository/user/user_repository.dart';
+import 'package:test_bus_app/repository/user/user_repository_impl.dart';
 import 'package:test_bus_app/services/auth/auth_service.dart';
 import 'package:test_bus_app/services/storage/storage_service.dart';
+
 
 final GetIt getIt = GetIt.instance;
 
@@ -38,12 +41,14 @@ Future<void> setupLocator() async {
   // Repositories
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepository(
-      getIt<NetworkApiService>(),
       getIt<AuthService>(),
       getIt<AppLogger>(),
     ),
   );
+  getIt.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(getIt<AuthService>(), getIt<AppLogger>()),
+  );
 
   // Blocs
-  getIt.registerFactory(() => AuthBloc(getIt<AuthRepository>()));
+  getIt.registerFactory(() => AuthBloc(getIt<AuthRepository>(), getIt<AppLogger>()));
 }

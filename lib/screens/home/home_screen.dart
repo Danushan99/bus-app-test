@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:test_bus_app/bloc/auth/auth_bloc.dart';
+import 'package:test_bus_app/bloc/auth/auth_state.dart';
 import 'package:test_bus_app/common/constants/app_colors.dart';
 import 'package:test_bus_app/common/themes/app_styling.dart';
+import 'package:test_bus_app/common/widgets/app_drawer.dart';
 import 'package:test_bus_app/screens/home/widgets/bus_ticket_card.dart';
 import 'package:test_bus_app/screens/home/widgets/date_selector_widget.dart';
 
@@ -12,6 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedDateIndex = 1;
 
   // Dummy Bus Data based on the selected date
@@ -107,7 +112,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final currentBuses = _dailyBusData[_selectedDateIndex];
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.backgroundLight,
+      drawer: const AppDrawer(activeItem: 'Home'),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,11 +131,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Good Morning, Kaja!',
-                        style: AppStyling.normal500Size16.copyWith(
-                          color: AppColors.textPrimary,
-                        ),
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          final name = state is Authenticated
+                              ? state.user.name
+                              : 'there';
+                          return Text(
+                            'Good Morning, $name!',
+                            style: AppStyling.normal500Size16.copyWith(
+                              color: AppColors.textPrimary,
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -149,21 +163,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
 
                   // Menu Button
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceLight,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                  GestureDetector(
+                    onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceLight,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(Icons.menu, color: AppColors.textPrimary),
                     ),
-                    child: const Icon(Icons.menu, color: AppColors.textPrimary),
                   ),
                 ],
               ),

@@ -4,12 +4,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:test_bus_app/bloc/auth/auth_event.dart';
 import 'package:test_bus_app/bloc/auth/auth_state.dart';
+import 'package:test_bus_app/config/app_logger.dart';
 import 'package:test_bus_app/repository/auth/auth_repository.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
+  final AppLogger _logger;
 
-  AuthBloc(this._authRepository) : super(AuthInitial()) {
+  AuthBloc(this._authRepository, this._logger) : super(AuthInitial()) {
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<LoginRequested>(_onLoginRequested);
     on<LogoutRequested>(_onLogoutRequested);
@@ -20,11 +22,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (_authRepository.isLoggedIn) {
       final user = _authRepository.cachedUser;
       if (user != null) {
+        _logger.info('Auth status: already logged in (${user.email})');
         emit(Authenticated(user));
       } else {
+        _logger.info('Auth status: session exists but no user data');
         emit(Unauthenticated());
       }
     } else {
+      _logger.info('Auth status: no active session');
       emit(Unauthenticated());
     }
   }

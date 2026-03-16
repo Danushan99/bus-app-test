@@ -1,8 +1,11 @@
 // lib/screens/splash/splash_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:test_bus_app/bloc/auth/auth_bloc.dart';
+import 'package:test_bus_app/bloc/auth/auth_state.dart';
 import 'package:test_bus_app/common/constants/app_colors.dart';
 import 'package:test_bus_app/routes/app_routes_constants.dart';
 
@@ -18,7 +21,11 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
+      if (!mounted) return;
+      final state = context.read<AuthBloc>().state;
+      if (state is Authenticated) {
+        context.goNamed(AppRoutesConstants.homeScreenRouteName);
+      } else {
         context.goNamed(AppRoutesConstants.loginScreenRouteName);
       }
     });
